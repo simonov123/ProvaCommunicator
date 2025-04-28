@@ -1,3 +1,4 @@
+#msg.py
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit,QLabel
 from conn import conn_mgr
@@ -16,6 +17,7 @@ class messenger(QWidget):
         layout = QVBoxLayout()
         self.chat_window = QTextEdit(self)
         self.chat_window.setReadOnly(True)
+        self.chat_window.verticalScrollBar().setValue(self.chat_window.verticalScrollBar().maximum())
         self.message_input = QLineEdit(self)
         send_button = QPushButton('Invia', self)
         conn_button = QPushButton('Connettiti',self)
@@ -32,14 +34,18 @@ class messenger(QWidget):
         self.cmgr.show()  
     def received_ip(self, ip):
         print(f"Connessione riuscita all'IP: {ip}")
-        # Qui puoi fare ciò che vuoi con l'IP, ad esempio usarlo nella finestra principale
         self.chat_window.append(f"Connesso a: {ip}") 
         self.actualip=ip
     def invio(self):
         clear_msg=self.message_input.text()
-        if self.actualip != "":
-            self.chat_window.append("tu:"+clear_msg)
-            cryptmsg=crmgr.keygen(clear_msg)
+        #if self.actualip != "":      controllo bloccato per debug 
+        self.chat_window.append("tu:"+clear_msg)
+        key=crmgr.keygen(clear_msg)
+        cryptmsg=crmgr.OTPcrypt(clear_msg,key)
+        print(cryptmsg)
+        enkey=crmgr.encrypt_otp(key)
+        print(enkey)
+        
 
         
     

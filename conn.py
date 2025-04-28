@@ -1,7 +1,9 @@
+#conn.py
 import socket
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit,QLabel
 actualip=""
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 class conn_mgr(QWidget):
     conn_success = pyqtSignal(str)
     def __init__(self):
@@ -37,7 +39,6 @@ class conn_mgr(QWidget):
                 port = 3303  # Porta predefinita
                 self.setWindowTitle(f"Porta non valida, utilizzando la porta di default: {port}")
             print(port)
-            s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             s.connect((ip,port))
             actualip=ip
             self.conn_success.emit(ip)
@@ -47,7 +48,10 @@ class conn_mgr(QWidget):
         except socket.error as e:
             self.setWindowTitle(f"Errore di connessione: {e}")
     def invio_messaggio(messaggio_crypt):
-        print("todo")
+       print(o)
+
+        
+        
 
         
 
