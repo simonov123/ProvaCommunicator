@@ -1,11 +1,11 @@
 #conn.py
 import socket
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal,QObject,QThread
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit,QLabel
 actualip=""
-s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 class conn_mgr(QWidget):
     conn_success = pyqtSignal(str)
+    new_message = pyqtSignal(str, str)
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Inserire IP')
@@ -38,17 +38,55 @@ class conn_mgr(QWidget):
                 # Se la porta non è valida, imposta una porta di default
                 port = 3303  # Porta predefinita
                 self.setWindowTitle(f"Porta non valida, utilizzando la porta di default: {port}")
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.settimeout(5)  # timeout breve per evitare blocchi infiniti
+            self.s.connect((ip, port))
+            self.s.settimeout(None) 
+            self.thread = QThread()
+            self.worker = self.Ricevitore(self.s)
+            self.worker.moveToThread(self.thread)
+            self.worker.new_message.connect(self.new_message)
+            self.thread.started.connect(self.worker.run)
+            self.thread.start()    
             print(port)
-            s.connect((ip,port))
             actualip=ip
             self.conn_success.emit(ip)
             self.close()
         except socket.timeout:
-            self.setWindowTitle(f"Errore: Timeout raggiunto mentre cercavi di connetterti a {ip}:{porta}")
+            self.setWindowTitle(f"Errore: Timeout raggiunto mentre cercavi di connetterti a {ip}:{port}")
         except socket.error as e:
             self.setWindowTitle(f"Errore di connessione: {e}")
-    def invio_messaggio(messaggio_crypt):
-       print(o)
+    def invio_messaggio(self,otp,key,messaggio_criptato):
+         if self.s:
+            try:
+                self.s.sendall((otp + "//" + key + "//" + messaggio_criptato).encode('utf-8'))
+            except socket.error as e:
+                print(f"Errore invio messaggio: {e}")
+   
+    class Ricevitore(QObject):
+      new_message = pyqtSignal(str, str)  # chiave_criptata, messaggio_criptato
+
+      def __init__(self, sock):
+        super().__init__()
+        self.sock = sock
+        self.running = True
+
+      def run(self):
+        while self.running:
+            try:
+                data = self.sock.recv(4096)
+                if not data:
+                    break
+                decoded = data.decode('utf-8')
+                parts = decoded.split("//", 2)
+                if len(parts) == 3:
+                    otp,key,messaggio_criptato = parts
+                    self.new_message.emit(otp,key,messaggio_criptato)
+            except Exception as e:
+                print(f"Errore ricezione: {e}")
+                break
+
+
 
         
         

@@ -7,6 +7,7 @@ crmgr=cryptmgr()
 class messenger(QWidget):
     actualip=""
     
+    
 
 
     def __init__(self):
@@ -30,7 +31,8 @@ class messenger(QWidget):
         self.setLayout(layout)
     def connessione(self):
         self.cmgr = conn_mgr() 
-        self.cmgr.conn_success.connect(self.received_ip)  
+        self.cmgr.conn_success.connect(self.received_ip) 
+        self.cmgr.new_message.connect(self.ricevi_messaggio) 
         self.cmgr.show()  
     def received_ip(self, ip):
         print(f"Connessione riuscita all'IP: {ip}")
@@ -38,13 +40,22 @@ class messenger(QWidget):
         self.actualip=ip
     def invio(self):
         clear_msg=self.message_input.text()
-        #if self.actualip != "":      controllo bloccato per debug 
-        self.chat_window.append("tu:"+clear_msg)
-        key=crmgr.keygen(clear_msg)
-        cryptmsg=crmgr.OTPcrypt(clear_msg,key)
-        print(cryptmsg)
-        enkey=crmgr.encrypt_otp(key)
-        print(enkey)
+        if self.actualip != "":     
+            self.chat_window.append("tu:"+clear_msg)
+            key=crmgr.keygen(clear_msg)
+            cryptmsg=crmgr.OTPcrypt(clear_msg,key)
+            print(cryptmsg)
+            enotp,enkey=crmgr.encrypt_otp(key)
+            print(enotp,enkey)
+            self.cmgr.invio_messaggio(enotp,enkey,cryptmsg)
+    def ricevi_messaggio(self,otp,enkey, cryptmsg):
+        print("Messaggio ricevuto!")
+        print(f"Chiave otp: {otp}")
+        print(f"Chiave crypt: {enkey}")
+        print(f"Messaggio criptato: {cryptmsg}")
+       # key = crmgr.decrypt_otp(enkey)  
+        #clear_msg = crmgr.OTPdecrypt(cryptmsg, key) 
+        #self.chat_window.append("loro: " + clear_msg)
         
 
         
