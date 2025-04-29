@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTe
 
 class conn_mgr(QWidget):
     conn_success = pyqtSignal(str)
-    new_message = pyqtSignal(str, str)
+    new_message = pyqtSignal(str, str,str)
 
     def __init__(self):
         super().__init__()
@@ -47,7 +47,8 @@ class conn_mgr(QWidget):
             else:
                 port = 33000
                 self.setWindowTitle("Porta non valida, uso 33000")
-
+            self.remote_ip = ip
+            
             self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_sock.settimeout(5)
             self.client_sock.connect((ip, port))
@@ -68,7 +69,7 @@ class conn_mgr(QWidget):
 
     def start_server(self):
         self.server_thread = QThread()
-        self.server_worker = self.Server()
+        self.server_worker = self.Server(self)
         self.server_worker.moveToThread(self.server_thread)
         self.server_worker.new_message.connect(self.new_message)
         self.server_thread.started.connect(self.server_worker.run)
@@ -81,7 +82,7 @@ class conn_mgr(QWidget):
             print(f"Errore invio: {e}")
 
     class Ricevitore(QObject):
-        new_message = pyqtSignal(str, str)
+        new_message = pyqtSignal(str, str,str)
 
         def __init__(self, sock):
             super().__init__()
@@ -96,13 +97,13 @@ class conn_mgr(QWidget):
                     parts = data.decode().split("//", 2)
                     if len(parts) == 3:
                         otp, key, msg = parts
-                        self.new_message.emit(otp, key)
+                        self.new_message.emit(otp, key,msg)
                 except Exception as e:
                     print(f"Errore ricezione client: {e}")
                     break
 
     class Server(QObject):
-        new_message = pyqtSignal(str, str)
+        new_message = pyqtSignal(str, str,str)
 
         def run(self):
             server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -121,7 +122,7 @@ class conn_mgr(QWidget):
                         parts = data.decode().split("//", 2)
                         if len(parts) == 3:
                             otp, key, msg = parts
-                            self.new_message.emit(otp, key)
+                            self.new_message.emit(otp, key,msg)
                 except Exception as e:
                     print(f"Errore server: {e}")
                     break
