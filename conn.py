@@ -62,6 +62,8 @@ class conn_mgr(QWidget):
                 self.s.sendall((otp + "//" + key + "//" + messaggio_criptato).encode('utf-8'))
             except socket.error as e:
                 print(f"Errore invio messaggio: {e}")
+                self.s.close()
+                self.s = None
    
     class Ricevitore(QObject):
       new_message = pyqtSignal(str, str)  # chiave_criptata, messaggio_criptato
@@ -76,6 +78,10 @@ class conn_mgr(QWidget):
             try:
                 data = self.sock.recv(4096)
                 if not data:
+                    print("Connessione chiusa dal server.")
+                    self.sock.close()
+                    self.running = False
+                    actualip=""
                     break
                 decoded = data.decode('utf-8')
                 parts = decoded.split("//", 2)

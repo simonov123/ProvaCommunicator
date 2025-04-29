@@ -53,9 +53,9 @@ class messenger(QWidget):
         print(f"Chiave otp: {otp}")
         print(f"Chiave crypt: {enkey}")
         print(f"Messaggio criptato: {cryptmsg}")
-       # key = crmgr.decrypt_otp(enkey)  
-        #clear_msg = crmgr.OTPdecrypt(cryptmsg, key) 
-        #self.chat_window.append("loro: " + clear_msg)
+        key = crmgr.decrypt_otp(enkey)  
+        clear_msg = crmgr.OTPdecrypt(cryptmsg, key) 
+        self.chat_window.append("loro: " + clear_msg)
         
 
         

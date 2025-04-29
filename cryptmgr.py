@@ -33,7 +33,7 @@ class cryptmgr:
         ciphertext, tag = cipher.encrypt_and_digest(otp_key.encode())
         encrypted_otp=base64.b64encode(cipher.nonce + tag + ciphertext).decode()
         encrypted_secret_key = base64.b85encode(secret_key).decode() 
-        return encrypted_data,encrypted_secret_key
+        return encrypted_otp,encrypted_secret_key
     def decrypt_otp(self,otp_key):
         print("todo")
 
