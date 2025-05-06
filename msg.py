@@ -1,7 +1,7 @@
 #msg.py
 # msg.py
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit, QLabel
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit, QLabel
 from conn import conn_mgr
 from cryptmgr import cryptmgr
 
@@ -73,4 +73,4 @@ class messenger(QWidget):
 app = QApplication(sys.argv)
 mess = messenger()
 mess.show()
-sys.exit(app.exec_())
+sys.exit(app.exec())

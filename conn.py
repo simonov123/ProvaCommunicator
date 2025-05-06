@@ -1,7 +1,7 @@
 #conn.py
 import socket
-from PyQt5.QtCore import pyqtSignal, QObject, QThread, QTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit, QLabel
+from PyQt6.QtCore import pyqtSignal, QObject, QThread, QTimer
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLineEdit, QLabel
 
 class conn_mgr(QWidget):
     conn_success = pyqtSignal(str)
